@@ -1,14 +1,11 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import styled from 'styled-components'
 import Timer from './Timer'
 import Board from './Board'
 import Digits from './Digits'
-import Settings from './Settings'
 
 const Wrapper = styled.div`
   padding: 7px;
-  width: 494px;
-  height: 324px;
   background: silver;
   box-shadow: 1px 1px 2px 0px rgba(0,0,0,0.5);
 `
@@ -25,7 +22,6 @@ const Header = styled.div`
 
 const HeaderSide = styled.div`
   display: flex;
-  width: 100px;
   ${props => props.right && 'justify-content: flex-end;'}
 `
 
@@ -34,26 +30,43 @@ const RestartButton = styled.div`
   width: 20px;
 `
 
-const Game = ({ mines, rows, cols }) => {
-  const [attempt, setAttempt] = useState(0);
-  const [isGameOver, setIsGameOver] = useState(false);
-  const [isGameStarted, setIsGameStarted] = useState(false);
+const EditButton = styled.div`
+  margin: -3px 0 4px;
+  cursor: pointer;
+  font-size: 12px;
+`
 
-  const handleStart = () => {
+const Game = ({ settings, onEdit }) => {
+  const [attempt, setAttempt] = useState(0)
+  const [isGameOver, setIsGameOver] = useState(false)
+  const [isGameStarted, setIsGameStarted] = useState(false)
+
+  const handleRestart = useCallback(() => {
     setAttempt(attempt + 1)
     setIsGameOver(false)
     setIsGameStarted(false)
-  }
+  }, [attempt])
+
+  const handleGameStart = useCallback(() => {
+    setIsGameStarted(true)
+  }, [])
+
+  const handleGameOver = useCallback(() => {
+    setIsGameOver(true)
+  }, [])
+
+  console.log('render game')
 
   return (
     <Wrapper>
+      <EditButton onClick={onEdit}>Settings</EditButton>
       <Header>
         <HeaderSide>
-          <Digits value={mines} />
+          <Digits value={settings.mines} />
         </HeaderSide>
 
         <RestartButton
-          onClick={handleStart}
+          onClick={handleRestart}
         >
           {isGameOver ? '😵' : '🙂'}
         </RestartButton>
@@ -68,12 +81,11 @@ const Game = ({ mines, rows, cols }) => {
 
       <Board
         key={attempt}
-        mines={mines}
-        cols={cols}
-        rows={rows}
+        settings={settings}
         isGameOver={isGameOver}
-        onGameStart={() => setIsGameStarted(true)}
-        onGameOver={() => setIsGameOver(true)}
+        onGameStart={handleGameStart}
+        isGameStarted={isGameStarted}
+        onGameOver={handleGameOver}
       />
     </Wrapper>
   );

@@ -11,11 +11,19 @@ const Wrapper = styled.div`
 `
 
 function App() {
-  const [settings, setSetting] = useState(null);
+  const [settings, setSettings] = useState({ rows: 9, cols: 16, mines: 16, debug: false });
+  const [isEditing, setIsEditing] = useState(true);
+
+  const handleStart = settings => {
+    setSettings(settings)
+    setIsEditing(false)
+  }
+  const handleEdit = () => setIsEditing(true)
 
   return (
     <Wrapper>
-      {settings ? <Game {...settings} /> : <Settings />}
+      {isEditing ? <Settings initial={settings} onProceed={handleStart} /> :
+        <Game settings={settings} onEdit={handleEdit} />}
     </Wrapper>
   );
 }

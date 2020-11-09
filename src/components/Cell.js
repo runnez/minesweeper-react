@@ -16,7 +16,7 @@ const Wrapper = styled.div`
     border-style: inset;
   `}
 
-  ${props => props.failed && `
+  ${props => props.exploded && `
     background: #FF1D00;
     border-color: transparent;
   `}
@@ -27,25 +27,34 @@ const Counter = styled.div`
   color: ${props => ['#2301FF', '#017B00', '#FF1D00'][props.count - 1] || '#7B0800'}
 `
 
-const Cell = React.memo(function({
-  opened,
-  mined,
-  failed,
-  flagged,
-  revealed,
-  count,
-  onReveal,
-  onFlag
-}) {
+const Cell = React.memo(function(props) {
+  const {
+    opened,
+    mined,
+    exploded,
+    flagged,
+    revealed,
+    count,
+    id,
+    onReveal,
+    onFlag
+  } = props
+  console.log('render cell')
+
   return (
     <Wrapper
       opened={opened}
-      failed={failed}
+      exploded={exploded}
       revealed={revealed}
-      onClick={onReveal}
+      onClick={() =>
+        !flagged && onReveal(id)
+      }
       onContextMenu={(evt) => {
         evt.preventDefault()
-        onFlag()
+
+        if (onFlag) {
+          onFlag(id)
+        }
       }}
     >
       <CellContent

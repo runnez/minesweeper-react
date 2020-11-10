@@ -79,7 +79,7 @@ const Game = ({
             [gameStateTypes.lost]: '😵',
             [gameStateTypes.won]: '🏆',
             [gameStateTypes.idle]: '🙂',
-            [gameStateTypes.started]: '🙂'
+            [gameStateTypes.started]: '🏄‍♂️'
           }[state.gameState]}
         </RestartButton>
 

@@ -27,18 +27,17 @@ const Counter = styled.div`
   color: ${props => ['#2301FF', '#017B00', '#FF1D00'][props.count - 1] || '#7B0800'}
 `
 
-const Cell = React.memo(function(props) {
-  const {
-    opened,
-    mined,
-    exploded,
-    flagged,
-    revealed,
-    count,
-    id,
-    onReveal,
-    onFlag
-  } = props
+const Cell = React.memo(function({
+  opened,
+  mined,
+  exploded,
+  flagged,
+  revealed,
+  count,
+  id,
+  onReveal,
+  onFlag
+}) {
   console.log('render Cell')
 
   return (
@@ -67,7 +66,7 @@ const Cell = React.memo(function(props) {
   )
 })
 
-const CellContent = React.memo(function({
+const CellContent = function({
   flagged,
   mined,
   opened,
@@ -77,6 +76,6 @@ const CellContent = React.memo(function({
   if (mined) return '💣'
   if (opened && count > 0) return <Counter count={count}>{count}</Counter>
   return null
-})
+}
 
 export default Cell

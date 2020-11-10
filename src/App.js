@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import GameController from './components/GameController'
+import Game from './components/Game'
 import Settings from './components/Settings'
 
 const Wrapper = styled.div`
@@ -27,7 +27,7 @@ function App() {
           initial={settings}
           onProceed={handleStart}
         /> :
-        <GameController
+        <Game
           settings={settings}
           onEdit={handleEdit}
         />}

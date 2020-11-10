@@ -13,6 +13,12 @@ const Form = styled.form`
   }
 `
 
+const Title = styled.div`
+  margin: 0 0 5px;
+  font-weight: 700;
+  font-size: 18px;
+`
+
 const FormBody = styled.div`
   display: flex;
   margin: 0 0 4px;
@@ -34,16 +40,24 @@ const Settings = ({ initial, onProceed }) => {
       return setError('too many mines')
     }
 
+    console.log({
+      rows: Number(rows),
+      cols: Number(cols),
+      mines: Number(mines)
+    })
+
     onProceed({
-      rows,
-      cols,
-      mines,
+      rows: Number(rows),
+      cols: Number(cols),
+      mines: Number(mines),
       debug
     })
   }
 
   return (
     <Form onSubmit={handleSubmit}>
+      <Title>React Minesweeper</Title>
+
       <FormBody>
         <FormField
           label="Rows"

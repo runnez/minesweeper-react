@@ -13,7 +13,8 @@ const Digit = styled.div`
 `
 
 const Digits = ({ value }) => {
-  const visibleValue = '0'.repeat(3 - String(value).length) + value
+  const fillerLength = 3 - String(value).length
+  const visibleValue = '0'.repeat(fillerLength >= 0 ? fillerLength : 0) + value
 
   return (
     <Wrapper>

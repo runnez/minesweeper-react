@@ -1,8 +1,8 @@
 # React Minesweeper
 
-[Demo](https://minesweeper-react-18406.web.app/)
-
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+[Demo](https://minesweeper-react-18406.web.app/)
 
 ## Design questions
 1. how to render gameboard grid?

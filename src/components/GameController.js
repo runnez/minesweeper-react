@@ -77,7 +77,7 @@ const GameController = ({ settings, onEdit }) => {
         <HeaderSide right>
           <Timer
             key={attempt}
-            paused={['idle', 'win', 'loss'].includes(gameState)}
+            paused={gameState !== 'started'}
           />
         </HeaderSide>
       </Header>

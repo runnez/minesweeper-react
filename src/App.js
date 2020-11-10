@@ -22,8 +22,15 @@ function App() {
 
   return (
     <Wrapper>
-      {isEditing ? <Settings initial={settings} onProceed={handleStart} /> :
-        <GameController settings={settings} onEdit={handleEdit} />}
+      {isEditing ?
+        <Settings
+          initial={settings}
+          onProceed={handleStart}
+        /> :
+        <GameController
+          settings={settings}
+          onEdit={handleEdit}
+        />}
     </Wrapper>
   );
 }

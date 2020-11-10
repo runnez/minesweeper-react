@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useReducer } from 'react'
+import React, { useCallback, useReducer } from 'react'
 import styled from 'styled-components'
 import { reducer, init, actionTypes, gameStateTypes } from './Game.reducer'
 import Cell from './Cell'
@@ -103,7 +103,7 @@ const Game = ({
               opened={Boolean(state.opened[cell])}
               flagged={Boolean(state.flagged[cell])}
               mined={Boolean((state.gameState === gameStateTypes.lost || settings.debug) && state.mined[cell])}
-              exploded={state.explodedKey === cell}
+              exploded={state.explodedCell === cell}
               revealed={Boolean((state.gameState === gameStateTypes.lost || settings.debug) && state.mined[cell])}
               count={(state.opened[cell] && state.adjacentMinesCount[cell]) || 0}
               onReveal={handleReveal}

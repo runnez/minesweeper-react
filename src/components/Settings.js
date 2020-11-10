@@ -38,9 +38,9 @@ const Settings = ({ initial, onProceed }) => {
   const [error, setError] = useState('');
 
   const handleSubmit = (e) => {
-    setError('')
-
     e.preventDefault()
+
+    setError('')
 
     const cells = rows * cols
 

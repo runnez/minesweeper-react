@@ -30,7 +30,7 @@ export function init({ settings }) {
     mined: {},
     adjacentMinesCount: {},
     remainFlags: settings.mines,
-    explodedKey: ''
+    explodedCell: ''
   }
 }
 
@@ -58,7 +58,8 @@ export function reducer(state, action) {
         ...state,
         flagged,
         remainFlags: state.settings.mines - Object.keys(flagged).length,
-        gameState: minesKeys.length > 0 && minesKeys.every(key => flagged[key]) ? gameStateTypes.won : state.gameState
+        gameState: minesKeys.length > 0 && minesKeys.every(key => flagged[key]) ?
+          gameStateTypes.won : state.gameState
       }
     }
     case actionTypes.reveal: {
@@ -66,55 +67,47 @@ export function reducer(state, action) {
 
       if (state.opened[cell]) return state
 
-      let mines = state.mined
+      let mined = state.mined
       let adjacentMinesCount = state.adjacentMinesCount
 
+      if (mined[cell]) {
+        return {
+          ...state,
+          gameState: gameStateTypes.lost,
+          explodedCell: cell
+        }
+      }
+
       if (state.gameState === gameStateTypes.idle) {
-        mines = generateMines(
+        mined = generateMines(
           state.settings,
           getAdjacentCells(cell).reduce((acc, key) => ({ ...acc, [key]: true}), { [cell]: true })
         )
         adjacentMinesCount = state.grid.reduce((acc, key) =>
-          ({ ...acc, [key]: calcAdjacentMinesCount(mines, key) })
+          ({ ...acc, [key]: calcAdjacentMinesCount(mined, key) })
         , {})
-      }
-
-      const isLost = Boolean(mines[cell])
-      const opened = isLost ? state.opened : {
-        ...state.opened,
-        ...getOpenedArea(
-          mines,
-          cell,
-          state.settings.rows,
-          state.settings.cols,
-          state.gameState === gameStateTypes.started
-        )
       }
 
       return {
         ...state,
-        mined: mines,
-        gameState: isLost ? gameStateTypes.lost : gameStateTypes.started,
-        explodedKey: isLost ? cell : '',
         adjacentMinesCount,
-        opened
+        mined,
+        gameState: gameStateTypes.started,
+        opened: {
+          ...state.opened,
+          ...revealArea(
+            mined,
+            cell,
+            state.settings.rows,
+            state.settings.cols,
+            state.gameState === gameStateTypes.started
+          )
+        }
       }
     }
     default:
       return state
   }
-}
-
-export function calcAdjacentMinesCount(mined, cell) {
-  return getAdjacentCells(cell).reduce((acc, point) => acc + (mined[point] || 0), 0)
-}
-
-function getCell(rowIdx, colIdx) {
-  return [rowIdx, colIdx].join('/')
-}
-
-function extractCellPos(cell) {
-  return cell.split('/').map(Number)
 }
 
 function generateMines(settings, exclude) {
@@ -138,6 +131,10 @@ function generateMines(settings, exclude) {
   return mines
 }
 
+function calcAdjacentMinesCount(mined, cell) {
+  return getAdjacentCells(cell).reduce((acc, point) => acc + (mined[point] || 0), 0)
+}
+
 function getAdjacentCells(cell, rowCount = Infinity, colCount = Infinity) {
   const [row, col] = extractCellPos(cell)
 
@@ -152,7 +149,7 @@ function getAdjacentCells(cell, rowCount = Infinity, colCount = Infinity) {
   ).map(pair => getCell(pair[0], pair[1]))
 }
 
-function getOpenedArea(mines, cell, rowCount, colCount, shallow) {
+function revealArea(mines, cell, rowCount, colCount, shallow) {
   if (shallow) {
     if (calcAdjacentMinesCount(mines, cell) > 0) {
       return { [cell]: true }
@@ -178,4 +175,12 @@ function getOpenedArea(mines, cell, rowCount, colCount, shallow) {
   }
 
   return result
+}
+
+function getCell(rowIdx, colIdx) {
+  return [rowIdx, colIdx].join('/')
+}
+
+function extractCellPos(cell) {
+  return cell.split('/').map(Number)
 }

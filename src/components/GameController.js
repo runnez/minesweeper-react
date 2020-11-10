@@ -37,6 +37,8 @@ const EditButton = styled.div`
 `
 
 const GameController = ({ settings, onEdit }) => {
+  console.log('render GameController')
+
   const [attempt, setAttempt] = useState(0)
   const [gameState, setGameState] = useState('idle')
   const [remainFlags, setRemainFlags] = useState(settings.mines)
@@ -57,8 +59,6 @@ const GameController = ({ settings, onEdit }) => {
   const handleOver = useCallback(() => {
     setGameState('loss')
   }, [])
-
-  console.log('render game controller')
 
   return (
     <Wrapper>

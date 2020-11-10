@@ -16,7 +16,7 @@ const Game = React.memo(({
   onWin,
   onFlag
 }) => {
-  console.log('render game')
+  console.log('render Game')
 
   const [state, dispatch] = useReducer(
     reducer,

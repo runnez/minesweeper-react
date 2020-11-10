@@ -39,7 +39,7 @@ const Cell = React.memo(function(props) {
     onReveal,
     onFlag
   } = props
-  console.log('render cell')
+  console.log('render Cell')
 
   return (
     <Wrapper

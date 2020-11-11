@@ -7,11 +7,11 @@ const Wrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100vh;
+  min-height: 100vh;
 `
 
 function App() {
-  const [settings, setSettings] = useState({ rows: 9, cols: 16, mines: 16, debug: false });
+  const [settings, setSettings] = useState({ rows: 80, cols: 80, mines: 100, debug: false });
   const [isEditing, setIsEditing] = useState(true);
 
   const handleStart = settings => {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Digits from './Digits'
 
-const Timer = React.memo(function({ paused }) {
+const Timer = React.memo(({ paused }) => {
   const [seconds, setSeconds] = useState(0)
 
   useEffect(() => {

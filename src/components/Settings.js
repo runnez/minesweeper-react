@@ -31,11 +31,11 @@ const FormBody = styled.div`
 `
 
 const Settings = ({ initial, onProceed }) => {
-  const [rows, setRows] = useState(initial.rows);
-  const [cols, setCols] = useState(initial.cols);
-  const [mines, setMines] = useState(initial.mines);
-  const [debug, setDebug] = useState(initial.debug);
-  const [error, setError] = useState('');
+  const [rows, setRows] = useState(initial.rows)
+  const [cols, setCols] = useState(initial.cols)
+  const [mines, setMines] = useState(initial.mines)
+  const [debug, setDebug] = useState(initial.debug)
+  const [error, setError] = useState('')
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -65,7 +65,7 @@ const Settings = ({ initial, onProceed }) => {
           label="Rows"
           value={rows}
           min={5}
-          max={35}
+          max={100}
           onChange={setRows}
         />
         <FormField
@@ -73,7 +73,7 @@ const Settings = ({ initial, onProceed }) => {
           value={cols}
           placeholder={30}
           min={8}
-          max={35}
+          max={100}
           onChange={setCols}
         />
         <FormField

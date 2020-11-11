@@ -48,7 +48,8 @@ const Game = ({
   settings,
   onEdit
 }) => {
-  console.log('render Game')
+  if (settings.debug) console.log('render Game')
+
   const [state, dispatch] = useReducer(reducer, { settings }, init)
 
   const handleReveal = useCallback(payload =>
@@ -106,6 +107,7 @@ const Game = ({
               exploded={state.explodedCell === cell}
               revealed={Boolean((state.gameState === gameStateTypes.lost || settings.debug) && state.mined[cell])}
               count={(state.opened[cell] && state.adjacentMinesCount[cell]) || 0}
+              debug={settings.debug}
               onReveal={handleReveal}
               onFlag={handleFlag}
             />

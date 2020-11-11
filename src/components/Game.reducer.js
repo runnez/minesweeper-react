@@ -43,15 +43,17 @@ export function reducer(state, action) {
       }
     }
     case actionTypes.flag: {
-      if (state.remainFlags <= 0 && !state.flagged[action.payload]) return state
+      const cell = action.payload
+
+      if (state.remainFlags <= 0 && !state.flagged[cell]) return state
 
       const flagged = { ...state.flagged }
       const minesKeys = Object.keys(state.mined)
 
-      if (state.flagged[action.payload]) {
-        delete flagged[action.payload]
+      if (state.flagged[cell]) {
+        delete flagged[cell]
       } else {
-        flagged[action.payload] = true
+        flagged[cell] = true
       }
 
       return {
@@ -68,7 +70,6 @@ export function reducer(state, action) {
       if (state.opened[cell]) return state
 
       let mined = state.mined
-      let adjacentMinesCount = state.adjacentMinesCount
 
       if (mined[cell]) {
         return {
@@ -78,32 +79,35 @@ export function reducer(state, action) {
         }
       }
 
+      console.time('reveal')
+
       if (state.gameState === gameStateTypes.idle) {
+        console.time('generateMines')
         mined = generateMines(
           state.settings,
           getAdjacentCells(cell).reduce((acc, key) => ({ ...acc, [key]: true}), { [cell]: true })
         )
-        adjacentMinesCount = state.grid.reduce((acc, key) =>
-          ({ ...acc, [key]: calcAdjacentMinesCount(mined, key) })
-        , {})
+        console.timeEnd('generateMines')
       }
 
-      return {
-        ...state,
-        adjacentMinesCount,
+      const [opened, adjacentMinesCount] = revealArea({
         mined,
-        gameState: gameStateTypes.started,
-        opened: {
-          ...state.opened,
-          ...revealArea(
-            mined,
-            cell,
-            state.settings.rows,
-            state.settings.cols,
-            state.gameState === gameStateTypes.started
-          )
-        }
+        cell,
+        settings: state.settings,
+        shallow: state.gameState === gameStateTypes.started,
+        adjacentMinesCount: state.adjacentMinesCount
+      })
+
+      const result = {
+        ...state,
+        mined,
+        opened: { ...state.opened, ...opened },
+        adjacentMinesCount,
+        gameState: gameStateTypes.started
       }
+      console.timeEnd('reveal')
+
+      return result
     }
     default:
       return state
@@ -131,54 +135,85 @@ function generateMines(settings, exclude) {
   return mines
 }
 
-function calcAdjacentMinesCount(mined, cell) {
-  return getAdjacentCells(cell).reduce((acc, point) => acc + (mined[point] || 0), 0)
-}
+const adjacentOffsets = [
+  [-1,-1],[-1,0],[-1,1],
+  [0,-1],        [0,1],
+  [1,-1], [1,0], [1,1]
+]
 
-function getAdjacentCells(cell, rowCount = Infinity, colCount = Infinity) {
-  const [row, col] = extractCellPos(cell)
+function getAdjacentCells(cell, rowCount = Infinity, colCount = Infinity, excludeCells = {}) {
+  const [origRow, origCol] = extractCellPos(cell)
 
-  return [
-    [-1,-1],[-1,0],[-1,1],
-    [0,-1],        [0,1],
-    [1,-1], [1,0], [1,1]
-  ].map(([offset1, offset2]) =>
-    [offset1 + row, offset2 + col]
-  ).filter(([r, c]) =>
-    r > -1 && c > -1 && r < rowCount && c < colCount
-  ).map(pair => getCell(pair[0], pair[1]))
-}
+  const adjacent = []
 
-function revealArea(mines, cell, rowCount, colCount, shallow) {
-  if (shallow) {
-    if (calcAdjacentMinesCount(mines, cell) > 0) {
-      return { [cell]: true }
+  for (let offets of adjacentOffsets) {
+    const row = offets[0] + origRow
+    const col = offets[1] + origCol
+
+    if (row > -1 && col > -1 &&
+        row < rowCount && col < colCount &&
+        !excludeCells[getCell(row, col)]) {
+          adjacent.push(getCell(row, col))
     }
   }
 
+  return adjacent
+}
+
+function revealArea({
+  mined,
+  cell,
+  settings: { rows, cols },
+  shallow, // skip revealing if first element has ajacent mines
+  adjacentMinesCount // for incremental caching adjacentMinesCount
+}) {
   const stack = [cell]
-  const result = {}
+  const area = {}
+  const visited = {}
+  const adjacent = { ...adjacentMinesCount }
+
+  function calcAdjacentAndCache(cell) {
+    if (adjacent[cell] === undefined) {
+      adjacent[cell] = getAdjacentCells(cell, rows, cols).reduce((acc, point) => acc + (mined[point] ? 1 : 0), 0)
+    }
+
+    return adjacent[cell]
+  }
 
   while (stack.length) {
     const cursor = stack.pop()
-    result[cursor] = true
 
-    getAdjacentCells(cursor, rowCount, colCount).forEach(point => {
-      if (!mines[point] && !result[point]) {
-        if (calcAdjacentMinesCount(mines, point) === 0) {
-          stack.push(point)
-        } else {
-          result[point] = true
-        }
+    area[cursor] = true
+    visited[cursor] = true
+
+    if (shallow && stack.length === 0 && calcAdjacentAndCache(cell) > 0) {
+      break
+    }
+
+    const cells = getAdjacentCells(cursor, rows, cols, visited)
+
+    for (let cell of cells) {
+      visited[cell] = true
+    }
+
+    for (const point of cells) {
+      if (mined[point]) {
+        continue
       }
-    })
+
+      if (calcAdjacentAndCache(point) === 0) {
+        stack.push(point)
+      } else {
+        area[point] = true
+      }
+    }
   }
 
-  return result
+  return [area, adjacent]
 }
 
 function getCell(rowIdx, colIdx) {
-  return [rowIdx, colIdx].join('/')
+  return rowIdx + '/' + colIdx
 }
 
 function extractCellPos(cell) {

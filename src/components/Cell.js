@@ -28,26 +28,25 @@ const Counter = styled.div`
 `
 
 const Cell = React.memo(function({
+  id,
   opened,
   mined,
   exploded,
   flagged,
   revealed,
   count,
-  id,
+  debug,
   onReveal,
   onFlag
 }) {
-  console.log('render Cell')
+  if (debug) console.log('render Cell')
 
   return (
     <Wrapper
       opened={opened}
       exploded={exploded}
       revealed={revealed}
-      onClick={() =>
-        !flagged && onReveal(id)
-      }
+      onClick={() => !flagged && onReveal(id)}
       onContextMenu={(evt) => {
         evt.preventDefault()
 
